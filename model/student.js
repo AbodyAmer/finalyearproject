@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const _ = require('lodash')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 
 var studentschema = new mongoose.Schema({
   tp:{
@@ -36,10 +38,10 @@ var studentschema = new mongoose.Schema({
      type:String, 
      required: true, 
      unique:true, 
-     validate: {
-         validate : validator.isEmail,
-         message: '(Value) is not email'
-     }
+    //  validate: {
+    //      validate : validator.isEmail,
+    //      message: '(Value) is not email'
+    //  }
   }, 
   tokens :[{
       access: {
@@ -60,6 +62,80 @@ studentschema.methods.toJSON = function (){
     return _.pick(studentObject , ['tp' , 'name' , 'currentIntake','previousIntakes' ,'email' ,])
 }
 
+studentschema.pre('save' , function(next){
+   var user = this
+   if(user.isModified('password')){
+       bcrypt.genSalt(10)
+       .then(salt => {
+           bcrypt.hash(user.password , salt)
+           .then(hash => {
+               user.password = hash
+               next()
+           })
+           .catch(e => console.log(e))
+       })
+       .catch(e => console.log(e))
+   }
+   else {
+       next()
+   }
+})
+
+studentschema.statics.login = function(tp , password){
+    var Student = this
+    return Student.findOne({tp})
+    .then(student => {
+        if(!student)
+          return Promise.reject("Username or password is incorrect")
+
+          return bcrypt.compare(password , student.password)
+          .then(res => {
+              if(res)
+                return Promise.resolve(student)
+                return  Promise.reject("Username or password is incorrect")
+          })
+    })
+}
+
+let randomNum = 0 
+studentschema.methods.generateAuthToken = function(){
+    var student = this
+    var access = 'Auth'
+    randomNum = Math.random
+    var token = jwt.sign({_id: student._id.toHexString() , access} ,""+ randomNum).toString()
+    student.tokens = student.tokens.concat([{access , token}])
+    
+    return student.save().then(()=> token)
+}
+
+studentschema.statics.findByToken = function(token){
+    var Student = this
+    var decode 
+
+    try{
+       decode = jwt.verify(token , ""+randomNum)
+    }
+    catch(e){
+       return Promise.reject()
+    }
+    return Student.findOne({
+        '_id' : decode._id,
+        'tokens.token' : token,
+        'tokens.access' : decode.access
+    })
+
+
+}
+
+studentschema.methods.logout = function(token){
+    var student = this
+    
+    return student.update({
+        $pull:{
+            tokens: {token}
+        }
+    })
+}
 
 
 var Student = mongoose.model('Student' , studentschema)
