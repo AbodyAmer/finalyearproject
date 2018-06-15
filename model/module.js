@@ -8,21 +8,20 @@ var moduleSchema = new mongoose.Schema({
      trim:true,
      minlength: 1
     },
-    intake:{
+    intake:[{
         type:String,
      required:true, 
      trim:true,
      minlength: 1
-    }, 
+    }], 
     lecturer: {
-        type:String,
+        type:Object,
         required:true, 
-        trim:true,
-        minlength: 1
+      
     }, 
     expired: {
         type:Boolean,
-        required:false
+        required:true
     }
 })
 
@@ -30,6 +29,17 @@ moduleSchema.methods.toJSON = function(){
     var module = this
     var moduleObject = module.toObject()
     return _.pick(moduleObject , ['name' , 'intake' , 'lecturer' , 'expired'])
+}
+
+moduleSchema.statics.getModules = function(lecturer){
+   var Module = this
+   return Module.find({"lecturer.username": lecturer.username})
+   .then(modules => {
+       console.log("modules " ,modules)
+       return modules
+   })
+   .catch(e => e)
+
 }
 
 var Module = mongoose.model('module' , moduleSchema)

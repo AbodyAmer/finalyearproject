@@ -59,9 +59,9 @@ lecturerSchema.pre('save' , function(next){
                 user.password = hash
                 next()
             })
-            .catch(e => console.log(e))
+            .catch(e => e)
         })
-        .catch(e => console.log(e))
+        .catch(e => e)
     }
     else {
         next()
@@ -77,11 +77,10 @@ lecturerSchema.pre('save' , function(next){
  
            return bcrypt.compare(password , lecturer.password)
            .then(res => {
-               console.log(lecturer)
-               if(res){
-                   console.log('res ' , res)
+               
+               if(res)
                 return Promise.resolve(lecturer)
-               }
+             
                  
                  return  Promise.reject("Username or password is incorrect")
            })
