@@ -137,6 +137,20 @@ studentschema.methods.logout = function(token){
     })
 }
 
+studentschema.statics.getEmails =   function(intake) {
+    var Student = this
+
+    const emails =  intake.map(element => {
+        return Student.find({'currentIntake' : element})
+        .then(students => students.map(s => s.email))
+        .catch(e => e)
+    })
+
+    return Promise.all(emails)   
+}
+
+
+
 
 var Student = mongoose.model('Student' , studentschema)
 
