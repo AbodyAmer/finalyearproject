@@ -5,6 +5,9 @@ const _ = require('lodash')
 const moment = require('moment')
 const nodemailer = require('nodemailer')
 const {GroupMember} = require('../../model/groupMembers')
+const fs = require('fs')
+const mime = require('mime')
+const path = require('path')
 
 module.exports = app => {
     app.post('/api/getassignment' ,Authenticate.LectuerAuth ,(req, res) => {
@@ -12,6 +15,8 @@ module.exports = app => {
       const intake = req.body.intake
       const modules = req.body.module
       
+      
+
       Assignment.getOneAssignment(modules , intake)
       .then(assignmented =>{
         const assignment = _.pick(assignmented , ['intake' , 'module' , 'assignemtType' , 'assignementTitle' ,'dueDate'])
@@ -20,9 +25,50 @@ module.exports = app => {
       .catch(e => res.status(400).send(e))
     })
 
-    app.post('/api/startAssignemnt' , Authenticate.LectuerAuth , 
-     (req, res) => {
-      
+    app.post('/api/uploadfile', (req , res) => {
+     
+      if(req.files){
+
+        console.log(req.files)
+        let ext = mime.getExtension(req.files.file.mimetype)
+        let intakes = req.headers.intake.split(',')
+        console.log(intakes)
+        let module = req.headers.module
+        console.log(req.headers)
+        intakes.forEach(intake => {
+         try{
+             fs.mkdirSync(`./controller/files/${intake}` , 0o776)
+           
+        
+        
+         }
+         catch(e){
+
+         }      
+
+         var fileName = []
+          fs.readdirSync(`./controller/files/${intake}`).forEach(files => {
+            fileName = files.split('.')
+            if(fileName[0] === module){
+              fs.unlinkSync(`./controller/files/${intake}/${fileName[0]}.${fileName[1]}`)
+            }
+          })
+
+        
+          req.files.file.mv(`./controller/files/${intake}/${module}.${ext}`)
+                     
+        })
+      res.send('sucess')
+      }
+      else{
+      res.send('Failed')
+    }
+   })
+
+
+    app.post('/api/startAssignemnt' , Authenticate.LectuerAuth ,   (req, res) => {
+       console.log('Hello')
+     
       var assignments = _.pick(req.body , ['assignementTitle' , 'assignemtType' , 'module' , 'intake'])
       assignments.lecturer = req.lecturer
       
@@ -39,7 +85,7 @@ module.exports = app => {
        .then(emails => {
 
         sendEmails(emails , newAssignmetn)
-        console.log('Assignemtn Type ' ,newAssignmetn.assignemtType)
+         
         if(newAssignmetn.assignemtType === 'GROUP'){
           let min = req.body.min
           let max = req.body.max
@@ -54,6 +100,8 @@ module.exports = app => {
           GroupMember.formGroups(min, max , studentsNum , newAssignmetn.module , newAssignmetn.intake )
 
         }
+
+        
         
         res.send('Success')
        
@@ -102,11 +150,117 @@ module.exports = app => {
     }
 
     transporter.sendMail(mailOption , (err , res) => {
-        if(err)  console.log("Error")
+        if(err)   console.log("Error")
         else     console.log("OK")
     })
 
-    }
+    }  
 
+    app.put('/api/updateAssignemt' ,Authenticate.LectuerAuth ,(req,res) => {
+    
+      var isGroup = false
+     
+      var newObj = _.pick(req.body , ['module', 'intake' , 'assignemtType' , 'assignementTitle'])
+      var dueDate = moment(req.body.dueDate, 'YYYY-MM-DD').endOf('day')
+      newObj.dueDate = dueDate
+      console.log('is group' , isGroup)
+      console.log("newObj.assignemtType" , newObj.assignemtType)
+
+      var asss
+      Assignment.getOneAssignment(req.body.module , req.body.intake)
+      .then(ass => {
+           asss =  ass
+          if(ass.assignemtType === 'GROUP' && newObj.assignemtType !== 'GROUP'){
+            GroupMember.findGroupsAndDelete(newObj.module , newObj.intake)
+        .then(r => console.log(r))
+        .catch(e => console.log(e))
+          }
+          
+        
+      })
+      .catch(e => res.status(404).send(e))
+    
+    var now = moment(new Date() , 'YYYY-MM-DD').endOf('day')
+    if(now.isAfter(dueDate) || now.isSame(dueDate)){
+     return res.status(400).send('Due Date Must be after Today\'s date')    
+    }
+      Assignment.findAssignmentToUpdate(req.body.module , req.body.intake ,  newObj)
+      .then(assignmented => {
+        Student.getEmails(newObj.intake)
+        .then(emails => {
+          sendEmailsUpdate(emails ,newObj )
+          
+          if(asss.assignemtType !== 'GROUP' && newObj.assignemtType === 'GROUP'){
+            console.log('assfsadf')
+            let min = req.body.min
+          let max = req.body.max
+     
+          var studentsNum = 0
+          emails.forEach(el => {
+            el.forEach(num => {
+              studentsNum++
+            })
+          })
    
+          studentsNum = 50
+          GroupMember.formGroups(min, max , studentsNum , newObj.module , newObj.intake)
+          .then(ss => res.send("success"))
+          .catch(e => res.status(400).send(e))
+          }
+          
+        })
+        .catch(e => res.status(400).send(e))
+        res.send('success')
+        
+      })
+      .catch(e => res.status(400).send(e))
+
+    })
+
+    function sendEmailsUpdate(emailList , assignment){
+      let emails =''
+      emailList.forEach(element => {
+        element.forEach(email => {
+          emails += email+','
+        })
+      })
+
+      let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        secure: 'false',
+        port: 25,
+        auth:{
+         user : 'onlineassignemnt@gmail.com',
+         pass: 'Online@APUsubmission2018FYP'
+        },
+        tls:{
+         rejectUnauthorized: false
+        }
+      })
+
+      let mailOption = {
+       from: '"APU" <onlineassignemnt@gmail.com>',
+       to: emails,
+       subject: 'New Assignment',
+       html: `<div><h3>Dear Students</h3></div>,
+              <div>${assignment.module} Assignemnt has been updated
+              <ul>
+              <li>Module: ${assignment.module}</li>
+              <li>Assignment Title: ${assignment.assignementTitle}</li>
+              <li>Assignment Type: ${assignment.assignemtType}</li>
+              <li>Submission Date: ${moment(assignment.dueDate).format('dddd DD-MMMM-YYYY')}</li>
+              </ul>
+              </div> 
+              <footer><b>Note: This is generated email, do not reply</b></footer>
+       `
+   }
+
+   transporter.sendMail(mailOption , (err , res) => {
+       if(err)   console.log("Error")
+       else     console.log("OK")
+   })
+
+   }  
+
+
 }

@@ -25,6 +25,10 @@ var groupMemeberSchema = new mongoose.Schema({
         minlength:1,
         trim:true,
         required:true
+    }, 
+    studentNum:{
+        type: Number, 
+        required:true
     }
 })
 
@@ -37,16 +41,17 @@ groupMemeberSchema.methods.toJSON = function(){
 groupMemeberSchema.statics.formGroups = function(min, max , student , module ,intake){
     var GroupMember = this
     var groupArr = []
+    student = 50
     var iniGroups = parseInt(student/max)
     var studentRemind =  student -  iniGroups * max
    
-    
+    console.log('lets create groups')
     for(var i=1; i<=iniGroups; i++){
         groupArr.push(max)
     }
     
      
-    
+  
     
     
     
@@ -73,6 +78,7 @@ groupMemeberSchema.statics.formGroups = function(min, max , student , module ,in
             groupArr.push(studentsNum)
             
             
+            
         }
         else{
         groupArr.push(studentRemind)}
@@ -81,6 +87,7 @@ groupMemeberSchema.statics.formGroups = function(min, max , student , module ,in
     else if(studentRemind > min && studentRemind < max){
         
         groupArr.push(studentRemind)
+       
     }
     else{
         
@@ -107,8 +114,10 @@ groupMemeberSchema.statics.formGroups = function(min, max , student , module ,in
         var groupDate = {
             groupNumber: i,
             module,
-            intake
+            intake, 
+            studentNum: groupArr[i]
         }
+
 
         var groupObj = new GroupMember(groupDate)
         groupObj.save()
@@ -116,6 +125,13 @@ groupMemeberSchema.statics.formGroups = function(min, max , student , module ,in
     }
 
 }
+
+groupMemeberSchema.statics.findGroupsAndDelete = function(module , intake){
+    var GroupMember = this
+
+    return GroupMember.deleteMany({module , intake})
+}
+
 
 var GroupMember = mongoose.model('GroupMember' , groupMemeberSchema)
 

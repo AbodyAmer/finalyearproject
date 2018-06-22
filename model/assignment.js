@@ -65,6 +65,20 @@ assignmentSchema.methods.startNewAssignment = function(){
     .catch(e => e)
 }
 
+assignmentSchema.statics.findAssignmentToUpdate = function(module , intake , newObj ){
+    var Assignment = this
+  
+    return Assignment.findOneAndUpdate({module , intake} ,{
+        module: newObj.module, 
+        intake: newObj.intake,
+        assignemtType : newObj.assignemtType, 
+        dueDate: newObj.dueDate, 
+        assignementTitle : newObj.assignementTitle
+    })
+    
+}
+
+
 
 
 
