@@ -49,15 +49,15 @@ module.exports = app => {
 
                 Student.getStudentForAssignment(intake)
                 .then(students => {
-                    debugger
+                  
                     IndividualAssignment.getIndividualSubmission(moduled , intake)
                     .then(individualAssignment => {
                         //console.log("fdsf" ,individualAssignment.length )
                         let arrayList = []
-                        individualAssignment.map(ees => console.log("ee" , ees) || ees.map(single =>{
+                        individualAssignment.map(ees =>  ees.map(single =>{
                             arrayList = arrayList.concat(single)
                         }))
-                        console.log("Hello", arrayList)
+                        
                         individualSubmission(students , arrayList , assignment.dueDate)
                         .then(arrList => {
                             return res.send(arrList)
@@ -79,7 +79,7 @@ module.exports = app => {
         var arr =  groups.map(element => 
              groupSubmission.map(gs => {
                
-                console.log()
+               
                  let sortElement = element.intake.sort()
                  let sortGs = gs.intake.sort()
 
@@ -131,17 +131,16 @@ module.exports = app => {
             })
         )
 
-        console.log(arr)
+        
         return Promise.all(arr)
     }
 
     function individualSubmission(students , submissions, duedate){
 
         
-        console.log('function ' ,submissions )
-           console.log("students " , students)
+       
         var arr = students.map(studented => studented.map(student =>  submissions.map(submission =>{
-            console.log("student.tp " , student.tp)
+        
             if(student.tp === submission.studentTP ){
                 let submissiond = moment(submission.submissionDate , 'YYYY-MM-DD')
                 let dueDat = moment(duedate, 'YYYY-MM-DD').endOf('day')
