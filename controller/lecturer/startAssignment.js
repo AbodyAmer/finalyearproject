@@ -202,7 +202,7 @@ module.exports = app => {
             })
           })
    
-          studentsNum = 50
+       
           GroupMember.formGroups(min, max , studentsNum , newObj.module , newObj.intake)
           .then(ss => res.send("success"))
           .catch(e => res.status(400).send(e))

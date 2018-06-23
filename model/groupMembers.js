@@ -11,9 +11,10 @@ var groupMemeberSchema = new mongoose.Schema({
         minlength:1,
         trim:true
     },
-    students: [{
-        type:Object
-    }],
+    students: {
+        type:Array, 
+        
+    },
     module:{
         type:String,
         minlength:1,
@@ -22,8 +23,7 @@ var groupMemeberSchema = new mongoose.Schema({
     }, 
     intake:{
         type:Array,
-        minlength:1,
-        trim:true,
+       
         required:true
     }, 
     studentNum:{
@@ -38,10 +38,12 @@ groupMemeberSchema.methods.toJSON = function(){
     return _.pick(groupMemeberObject , ['groupNumber' , 'secretCode' , 'students' , 'module' , 'intake'])
 }
 
+
+
 groupMemeberSchema.statics.formGroups = function(min, max , student , module ,intake){
     var GroupMember = this
     var groupArr = []
-    student = 50
+    
     var iniGroups = parseInt(student/max)
     var studentRemind =  student -  iniGroups * max
    
@@ -50,12 +52,6 @@ groupMemeberSchema.statics.formGroups = function(min, max , student , module ,in
         groupArr.push(max)
     }
     
-     
-  
-    
-    
-    
-     
     if(studentRemind !== 0){
     if(studentRemind < min ){
       
@@ -132,6 +128,11 @@ groupMemeberSchema.statics.findGroupsAndDelete = function(module , intake){
     return GroupMember.deleteMany({module , intake})
 }
 
+groupMemeberSchema.statics.getGroups = function(module , intake){
+    var GroupMember = this
+  
+    return GroupMember.find({module , intake})
+}
 
 var GroupMember = mongoose.model('GroupMember' , groupMemeberSchema)
 

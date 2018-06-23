@@ -81,6 +81,8 @@ studentschema.pre('save' , function(next){
    }
 })
 
+
+
 studentschema.statics.login = function(tp , password){
     var Student = this
     return Student.findOne({tp})
@@ -135,6 +137,18 @@ studentschema.methods.logout = function(token){
             tokens: {token}
         }
     })
+}
+
+studentschema.statics.getStudentForAssignment =   function(intake) {
+    var Student = this
+
+    const students =  intake.map(element => {
+        return Student.find({'currentIntake' : element})
+        .then(students => students.map(s => s))
+        .catch(e => e)
+    })
+
+    return Promise.all(students)   
 }
 
 studentschema.statics.getEmails =   function(intake) {

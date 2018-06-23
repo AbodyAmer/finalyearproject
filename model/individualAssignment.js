@@ -11,8 +11,7 @@ var individualAssignmentSchema = new mongoose.Schema({
     intake:{
         type:String, 
         required:String, 
-        trim:true,
-        minlength:1 
+       
     }, 
     module:{
         type:String, 
@@ -26,18 +25,31 @@ var individualAssignmentSchema = new mongoose.Schema({
         trim:true,
         minlength:1
     },
-    dueDate: {
-        type:Date, 
-        require:true, 
-        trim:true,
-        minlength:1
-    }
+    
 })
 
 individualAssignmentSchema.methods.toJSON = function(){
     var iniAssignemnt = this
     var iniAssignemntObject = iniAssignemnt.toObject()
     return _.pick(iniAssignemntObject , ['studentTP' , 'intake' , 'module' ,'submissionDate' ,'dueDate' ])
+}
+
+individualAssignmentSchema.statics.getIndividualSubmission = function(module , intakes){
+    var IndividualAssignment = this
+
+    
+     var arr = intakes.map( intake =>  IndividualAssignment.find({module , intake})
+    .then(students => students.map(student => student))
+    .catch(e => e))
+
+    return Promise.all(arr)
+    
+
+    
+
+   
+   
+
 }
 
 var IndividualAssignment = mongoose.model('IndividualAssignment' , individualAssignmentSchema)
