@@ -1,42 +1,60 @@
 const mongoose = require('mongoose')
-const _lodash = require('lodash')
+const _ = require('lodash')
 
 var presentationSchema = new mongoose.Schema({
     module: {
        type:String, 
-       required:true,
+      
        trim:true,
        minlength:1
-    }, 
-    studentTP:{
-        type:Object, 
-        trim:true,
-        minlength:6
     },
     start:{
         type:String, 
-        required:true,
-        trim:true,
-        minlength:1
+       
     },
     end:{
         type:String, 
-        required:true,
+       
+    
+    },
+    date: {
+        type:Date, 
+       
+    },
+    intake: {
+        type:Array, 
+       
         trim:true,
         minlength:1
     }, 
-    lecturer:{
-        type:Object, 
-        required:true,
-        trim:true,
-        minlength:1
+    slot:{
+        type:Array, 
     }
 })
 
-presentationSchema.methods.toJSON = function(){
+// presentationSchema.methods.toJSON = function(){
+//     var presentation = this
+//     var presentatioObject = presentation.toObject()
+//     return _.pick(presentatioObject , ['module' , 'intake' , 'studentTP' , 'start' , 'end' , 'lecturer'])
+// }
+
+presentationSchema.statics.getPresentations = function(module, intake){
+    var Presentation = this
+
+    return Presentation.find({module, intake})
+    .then(preset => {  
+        if(preset.length === 0)
+           return Promise.reject("Presentations not found")
+        return Promise.resolve(preset)})
+    .catch(e => Promise.reject(e))
+
+}
+
+presentationSchema.methods.createPresentation = function(){
     var presentation = this
-    var presentatioObject = presentation.toObject()
-    return _.pick(presentatioObject , ['module' , 'intake' , 'studentTP' , 'start' , 'end' , 'lecturer'])
+    
+    return presentation.save()
+
 }
 
 var Presentation = mongoose.model('Presentation' , presentationSchema)

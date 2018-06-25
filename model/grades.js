@@ -25,7 +25,7 @@ var gradesSchema = new mongoose.Schema({
         trim:true,
         minlength:1
     },
-    approval:{
+    isApproved:{
        type:Boolean,
        required:true
     }
@@ -36,6 +36,27 @@ gradesSchema.methods.toJSON = function(){
     var gradeObject = grade.toObject()
     return _.pick(gradeObject , ['module' ,'studentTP' , 'grade' , 'feedback' , 'approval'])
 }
+
+gradesSchema.statics.getAssessment = function(module,studentTP ){
+    var Grade = this
+
+    return Grade.findOne({module , studentTP})
+    .then(assessment => {
+        if(!assessment)
+          return Promise.reject('Assessment not found')
+        
+          return Promise.resolve(assessment)         
+    })
+    .catch(e => Promise.reject(e))
+}
+
+gradesSchema.methods.saveAssessment = function(){
+    var grade = this
+
+    return grade.save()
+}
+
+
 
 var Grade = mongoose.model('Grade' , gradesSchema)
 module.exports = {Grade}

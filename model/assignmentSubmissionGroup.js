@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const _ = require('lodash')
+
 
 var groupAssignmentSubmissionSchema = new mongoose.Schema({
     group: {

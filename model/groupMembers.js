@@ -23,7 +23,6 @@ var groupMemeberSchema = new mongoose.Schema({
     }, 
     intake:{
         type:Array,
-       
         required:true
     }, 
     studentNum:{

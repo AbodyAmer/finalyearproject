@@ -7,7 +7,7 @@ const nodemailer = require('nodemailer')
 const {GroupMember} = require('../../model/groupMembers')
 const fs = require('fs')
 const mime = require('mime')
-const path = require('path')
+ 
 
 module.exports = app => {
     app.post('/api/getassignment' ,Authenticate.LectuerAuth ,(req, res) => {
@@ -29,33 +29,28 @@ module.exports = app => {
      
       if(req.files){
 
-        console.log(req.files)
+      
         let ext = mime.getExtension(req.files.file.mimetype)
         let intakes = req.headers.intake.split(',')
-        console.log(intakes)
+       
         let module = req.headers.module
-        console.log(req.headers)
+       
         intakes.forEach(intake => {
          try{
-             fs.mkdirSync(`./controller/files/${intake}` , 0o776)
-           
-        
-        
+             fs.mkdirSync(`./controller/files/questions/${intake}` , 0o776)
          }
          catch(e){
 
          }      
 
          var fileName = []
-          fs.readdirSync(`./controller/files/${intake}`).forEach(files => {
+          fs.readdirSync(`./controller/files/questions/${intake}`).forEach(files => {
             fileName = files.split('.')
             if(fileName[0] === module){
-              fs.unlinkSync(`./controller/files/${intake}/${fileName[0]}.${fileName[1]}`)
+              fs.unlinkSync(`./controller/files/questions/${intake}/${fileName[0]}.${fileName[1]}`)
             }
           })
-
-        
-          req.files.file.mv(`./controller/files/${intake}/${module}.${ext}`)
+          req.files.file.mv(`./controller/files/questions/${intake}/${module}.${ext}`)
                      
         })
       res.send('sucess')
