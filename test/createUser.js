@@ -35,9 +35,9 @@ app.post('/createStudent' , (req, res) => {
 
 app.post('/login' , (req, res) => {
  
-    Lecturer.login(req.body.username , req.body.password)
+    Student.login(req.body.username , req.body.password)
     .then(user =>{
-        user.generateAuthToken()
+         user.generateAuthToken()
         .then(token => {
             exports.stdentAuthToken = token
             res.status(200).send(user)})

@@ -11,10 +11,10 @@ var groupMemeberSchema = new mongoose.Schema({
         minlength:1,
         trim:true
     },
-    students: {
-        type:Array, 
-        
-    },
+    students:[{
+        tp: String, 
+        name: String
+    }],
     module:{
         type:String,
         minlength:1,
@@ -131,6 +131,15 @@ groupMemeberSchema.statics.getGroups = function(module , intake){
     var GroupMember = this
   
     return GroupMember.find({module , intake})
+}
+
+groupMemeberSchema.statics.getOneGroup = function(tp , module) {
+
+    return this.findOne({module , "students.tp": tp}).then(group => {
+        if(!group)
+          return Promise.reject('No group Found')
+        return group  
+    })
 }
 
 var GroupMember = mongoose.model('GroupMember' , groupMemeberSchema)

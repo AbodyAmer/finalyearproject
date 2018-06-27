@@ -8,12 +8,7 @@ var moduleSchema = new mongoose.Schema({
      trim:true,
      minlength: 1
     },
-    intake:[{
-        type:String,
-     required:true, 
-     trim:true,
-     minlength: 1
-    }], 
+    intake:[String], 
     lecturer: {
         type:Object,
         required:true, 
@@ -42,5 +37,15 @@ moduleSchema.statics.getModules = function(lecturer){
 
 }
 
-var Module = mongoose.model('module' , moduleSchema)
-module.exports = {Module}
+moduleSchema.statics.findIntakeModules = function(intakes, name){
+   
+    return Promise.all(intakes.map(intake => this.find({intake , name}).then(mods => {
+        return mods.map(mod => {
+            let mo = _.pick(mod , ['name' , 'expired'])
+            return mo
+        })
+    })))
+}
+
+var Modules = mongoose.model('Module' , moduleSchema)
+module.exports = {Modules}

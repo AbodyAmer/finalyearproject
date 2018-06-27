@@ -16,11 +16,7 @@ var groupAssignmentSubmissionSchema = new mongoose.Schema({
         trim:true,
         required:true
     }, 
-    intake:{
-        type:Array,
-        
-        required:true
-    }
+    intake:[String]
 })
 
 groupAssignmentSubmissionSchema.methods.toJSON = function(){
@@ -34,6 +30,15 @@ groupAssignmentSubmissionSchema.statics.getGroupSubmission = function(module ,in
     var GroupMemeberSubmission = this
 
     return GroupMemeberSubmission.find({module ,intake})
+}
+
+groupAssignmentSubmissionSchema.statics.getOneSubmission = function(group, module , intake){
+
+    return this.findOne({group, module , intake}).then(submission => {
+        if(!submission)
+         return Promise.reject('No submission')
+         return submission
+    })
 }
 
 var GroupMemeberSubmission = mongoose.model('GroupMemeberSubmission' , groupAssignmentSubmissionSchema)
