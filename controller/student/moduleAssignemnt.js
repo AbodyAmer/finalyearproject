@@ -3,17 +3,17 @@ const {StudentAuth} = require('../../model/authenticateMiddlerware')
 const {GroupMemeberSubmission} = require('../../model/assignmentSubmissionGroup')
 const {GroupMember} = require('../../model/groupMembers')
 const {IndividualAssignment} = require('../../model/individualAssignment')
+const {Presentation} = require('../../model/presentation')
 const moment = require('moment')
 const _ = require('lodash')
 const fs = require('fs')
 const mime = require('mime')
+
 module.exports = app => {
 
     app.post('/api/assignmentModule' , StudentAuth , async (req, res) => {
 
-        let moduleName = req.body.module
-        let intake = req.body.intake
-        let studentTP = req.body.tp
+        let {moduleName, intake, studentTP} = req.body
         let obj = {
             expired: null,
             submission: null,
@@ -59,7 +59,7 @@ module.exports = app => {
 
     app.post('/api/uploadQuestion/:type/:module/:intake/:student' , StudentAuth , async (req, res) =>{
 
-        console.log('start uploading file')
+      
         
         let url = ''
         if(req.files){
@@ -84,13 +84,10 @@ module.exports = app => {
                         fs.unlinkSync(`${url}/${fileName}`)
                     }
                 })
-         
-        
-                req.files.file.mv(`${url}/${name}`)
-                
+
+                req.files.file.mv(`${url}/${name}`)               
                 let intake = req.params.intake.split(',')
-       
-                let newGroupSubmission = {
+                   let newGroupSubmission = {
                     group: req.params.student,
                     submissionDate: moment(new Date() , 'YYYY-MM-DD'),
                     module: req.params.module,
@@ -140,5 +137,90 @@ module.exports = app => {
               
             }
         }
+    })
+
+
+    app.post('/api/getGroup' ,StudentAuth , async (req, res) => {
+
+        let {moduled, intakes} = req.body
+        
+        try{
+
+            let groups = await GroupMember.getGroups(moduled, intakes)
+            if(groups.length === 0){
+                throw new Error('Groups not found')
+            }
+            else{
+            return res.send(groups)
+            }
+
+        }
+        catch(err){
+           res.status(400).send('Groups not found')
+        }
+    })
+
+    app.post('/api/joinGroup' ,StudentAuth , async (req, res) => {
+
+        let {secrectCode, moduled, intakes, tp, groupNumer, name} = req.body
+        
+        try{
+           let OneGroup = await GroupMember.getSpecificGroup(groupNumer, moduled, intakes)
+                 
+           if(OneGroup.students.length === 0){
+               let leader = {
+                   tp, 
+                   name
+               }
+             OneGroup.students = await OneGroup.students.concat({tp, name})
+             let join = await GroupMember.leaderJoin(leader, secrectCode, groupNumer, moduled, intakes, OneGroup.students)
+                   
+              res.send(join)
+            }
+           else{
+            OneGroup.students = await OneGroup.students.concat({tp, name})
+            let join = await GroupMember.memberJoin(secrectCode, groupNumer, moduled, intakes, OneGroup.students)
+            if(!join){
+                res.send('Wrong secret code')
+            }
+            else{
+                res.send(join)
+            }
+         }
+        }
+        catch(err){
+          console.log(err)
+        }
+
+
+    })
+
+    app.post('/api/resetCode' , StudentAuth , async (req, res) => {
+        let { moduled, intakes, tp, groupNumer} = req.body
+        
+        
+            let resetCode = await GroupMember.resetCode(groupNumer, moduled, intakes, tp)
+              res.send(resetCode)
+       
+    })
+
+    app.post('/api/book' , StudentAuth , async (req, res) => {
+        let {moduled, intake, slot} = req.body
+   
+        let presentations = await Presentation.getPresentations(moduled, intake)
+         let slotsP = await presentations.slot.map(s => {
+             if(s.start === slot.start && s.end === slot.end)
+                 return {
+                     tp: slot.tp, 
+                     start: slot.start, 
+                     end: slot.end
+                 }
+             return s
+         })
+         let updatedPresentaions = await Presentation.updateOnePresentation(moduled, intake, slotsP)
+         
+         let presentationss = await Presentation.getPresentations(moduled, intake)
+         res.send(presentationss)
+       
     })
 }

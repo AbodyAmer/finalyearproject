@@ -27,9 +27,18 @@ var presentationSchema = new mongoose.Schema({
         trim:true,
         minlength:1
     }, 
-    slot:{
-        type:Array, 
-    }
+    slot:[{
+        tp:{
+            type:String
+        },
+        start:{
+            type:String
+        }, 
+        end: {
+            type:String
+        }
+
+    }]
 })
 
 // presentationSchema.methods.toJSON = function(){
@@ -41,7 +50,7 @@ var presentationSchema = new mongoose.Schema({
 presentationSchema.statics.getPresentations = function(module, intake){
     var Presentation = this
 
-    return Presentation.find({module, intake})
+    return Presentation.findOne({module, intake})
     .then(preset => {  
         if(preset.length === 0)
            return Promise.reject("Presentations not found")
@@ -54,8 +63,13 @@ presentationSchema.methods.createPresentation = function(){
     var presentation = this
     
     return presentation.save()
-
 }
+
+presentationSchema.statics.updateOnePresentation = function(module, intake, slot){
+    return this.findOneAndUpdate({module, intake} , {slot})
+}
+
+
 
 var Presentation = mongoose.model('Presentation' , presentationSchema)
 module.exports = {Presentation}

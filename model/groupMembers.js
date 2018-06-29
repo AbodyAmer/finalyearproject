@@ -28,6 +28,14 @@ var groupMemeberSchema = new mongoose.Schema({
     studentNum:{
         type: Number, 
         required:true
+    }, 
+    leader: {
+        tp:{
+            type:String
+        }, 
+        name:{
+            type:String
+        }
     }
 })
 
@@ -141,6 +149,41 @@ groupMemeberSchema.statics.getOneGroup = function(tp , module) {
         return group  
     })
 }
+
+groupMemeberSchema.statics.getSpecificGroup = function(groupNumber, module, intake){
+
+
+    return this.findOne({groupNumber, module, intake}).then(group => {
+        if(!group)
+         return Promise.reject('No group found')
+         return group
+    })
+    .catch(e => Promise.reject(e))
+}
+
+groupMemeberSchema.statics.leaderJoin = function(leader, secretCode, groupNumber, module, intake , students){
+
+    return this.findOneAndUpdate({module, intake , groupNumber}, {
+        students, 
+        secretCode, 
+        leader
+    })
+}
+
+groupMemeberSchema.statics.memberJoin = function(secretCode, groupNumber, module, intake , students){
+
+    return this.findOneAndUpdate({module, intake , groupNumber, secretCode}, {
+        students
+    })
+}
+
+groupMemeberSchema.statics.resetCode = function(groupNumber, module, intake , tp){
+
+    return this.findOneAndUpdate({module, intake , groupNumber, "leader.tp": tp }, {
+        secretCode: tp
+    })
+}
+
 
 var GroupMember = mongoose.model('GroupMember' , groupMemeberSchema)
 
