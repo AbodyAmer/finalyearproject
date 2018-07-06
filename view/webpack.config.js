@@ -14,17 +14,18 @@ const config = {
                 exclude: /node_modules/ , 
                 use:{
                     loader: 'babel-loader'
-                }
+                }, 
+               
             }, 
-            {
-                test:/\.css$/,
-                use:{
-                    loader: ['style-loader' , 'css-loader']
-                }
-            }
+          {  test:/\.css$/,
+            use:
+                 ['css-loader' , 'style-loader']
+            
+        }
         ]
     },
     devServer: { 
+        historyApiFallback: true,
         inline: true, 
         contentBase: './dist', 
         port: 8080, 

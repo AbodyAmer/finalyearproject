@@ -69,6 +69,7 @@ lecturerSchema.pre('save' , function(next){
  })
  
  lecturerSchema.statics.login = function(username , password){
+    
      var Lecturer = this
      return Lecturer.findOne({username})
      .then(lecturer => {

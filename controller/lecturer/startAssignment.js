@@ -12,12 +12,10 @@ const mime = require('mime')
 module.exports = app => {
     app.post('/api/getassignment' ,Authenticate.LectuerAuth ,(req, res) => {
      
-      const intake = req.body.intake
-      const modules = req.body.module
-      
-      
-
-      Assignment.getOneAssignment(modules , intake)
+      const {intake , modules } = req.body
+      const {lecturer} = req
+  
+      Assignment.getOneAssignment(modules , intake, lecturer.username)
       .then(assignmented =>{
         const assignment = _.pick(assignmented , ['intake' , 'module' , 'assignemtType' , 'assignementTitle' ,'dueDate'])
         return res.send(assignment)
@@ -29,7 +27,6 @@ module.exports = app => {
      
       if(req.files){
 
-      
         let ext = mime.getExtension(req.files.file.mimetype)
         let intakes = req.headers.intake.split(',')
        

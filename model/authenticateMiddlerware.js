@@ -1,11 +1,13 @@
 const {Student} = require('./student')
 const {Lecturer} = require('./lecturer')
 const {Admin} = require('./admin')
-const studentAuthToken = require('../test/createUser')
+// const studentAuthToken = require('../test/createUser')
+// const lecturerAuthToken = require('../controller/login')
 
 module.exports = {
      StudentAuth : (req , res , next) => {
-       var token = studentAuthToken.stdentAuthToken
+        let {studentAuth } = require('./auth/student')
+       var token = studentAuth
        
        Student.findByToken(token)
        .then(student => {
@@ -19,8 +21,10 @@ module.exports = {
        .catch(e =>res.status(401).send())
     } ,
     LectuerAuth : (req , res , next) => {
-        var token = studentAuthToken.stdentAuthToken // change this later
-       
+        const {lecAuth } = require('../controller/auth/lecturer')
+        console.log('Middleware' , lecAuth )
+        var token = lecAuth  // change this later
+        
        Lecturer.findByToken(token)
        .then(lecturer => {
            if(!lecturer)

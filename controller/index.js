@@ -6,4 +6,5 @@ require('./lecturer/assessment')(app)
 require('./lecturer/presentation')(app)
 require('./student/homePage')(app)
 require('./student/moduleAssignemnt')(app)
+require('./login')(app)
 }

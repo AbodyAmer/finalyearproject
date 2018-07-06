@@ -84,6 +84,7 @@ studentschema.pre('save' , function(next){
 
 
 studentschema.statics.login = function(tp , password){
+    
     var Student = this
     return Student.findOne({tp})
     .then(student => {

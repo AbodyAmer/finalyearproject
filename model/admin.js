@@ -56,7 +56,7 @@ adminSchema.pre('save' , function(next){
     }
  })
  
- adminSchema.statics.login = function(Username , password){S
+ adminSchema.statics.login = function(username , password){
      var Admin = this
      return Admin.findOne({username})
      .then(admin => {
