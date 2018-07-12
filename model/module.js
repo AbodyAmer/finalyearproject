@@ -30,7 +30,7 @@ moduleSchema.statics.getModules = function(lecturer){
    var Module = this
    return Module.find({"lecturer.username": lecturer.username})
    .then(modules => {
-       console.log("modules " ,modules)
+      
        return modules
    })
    .catch(e => e)

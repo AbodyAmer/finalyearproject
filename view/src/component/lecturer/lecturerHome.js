@@ -5,6 +5,9 @@ import {withRouter} from 'react-router-dom'
 import axios from 'axios'
 import {signout} from '../../action/sharedActions'
 import LoginContainer from '../../container/container'
+import SimpleExpansionPanel from './home/modulesList'
+
+
 
 
 
@@ -15,15 +18,21 @@ class LecturerHome extends Component{
 
         this.state ={
             open: false, 
-           
+            modules: []
         }
 
         this.handleClick = this.handleClick.bind(this)
         this.closeMenu  = this.closeMenu .bind(this)
         this.logout = this.logout.bind(this)
+        this.componentDidMount = this.componentDidMount.bind(this)
     }
 
     
+    componentDidMount(){
+         axios.get('/api/lecturer/getModuleList')
+         .then(res => this.setState({modules: res.data}))
+         .catch(e => console.log(e))
+    }
 
     handleClick () {
        
@@ -51,22 +60,35 @@ class LecturerHome extends Component{
         })
     }
 
+
     render(){
 
-        console.log('lecturer home ' , this.props)
+      
         return(
 
             
             <Fragment>
        { this.props.reduxState.sharedState.logged === false ?
         <LoginContainer />:
+        <Fragment>
            <MenuAppBar 
         open={this.state.open}
         handle={this.handleClick}
         close={this.closeMenu}
          username={this.props.reduxState.sharedState.user.name}
          logout={this.logout}
-        />}
+        />
+
+     
+        
+       <SimpleExpansionPanel 
+       modules={this.state.modules}
+       
+       />
+       
+    
+       </Fragment>
+        }
         </Fragment>
         )
     }

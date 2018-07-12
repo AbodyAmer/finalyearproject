@@ -14,7 +14,7 @@ module.exports = app => {
      
       const {intake , modules } = req.body
       const {lecturer} = req
-  
+      console.log(modules , intake)
       Assignment.getOneAssignment(modules , intake, lecturer.username)
       .then(assignmented =>{
         const assignment = _.pick(assignmented , ['intake' , 'module' , 'assignemtType' , 'assignementTitle' ,'dueDate'])
@@ -59,9 +59,10 @@ module.exports = app => {
 
 
     app.post('/api/startAssignemnt' , Authenticate.LectuerAuth ,   (req, res) => {
-       console.log('Hello')
+       
      
       var assignments = _.pick(req.body , ['assignementTitle' , 'assignemtType' , 'module' , 'intake'])
+      
       assignments.lecturer = req.lecturer
       
       var dueDate = moment(req.body.dueDate, 'YYYY-MM-DD').endOf('day')
@@ -151,16 +152,16 @@ module.exports = app => {
     app.put('/api/updateAssignemt' ,Authenticate.LectuerAuth ,(req,res) => {
     
       var isGroup = false
-     
+     console.log('update assignment')
       var newObj = _.pick(req.body , ['module', 'intake' , 'assignemtType' , 'assignementTitle'])
       var dueDate = moment(req.body.dueDate, 'YYYY-MM-DD').endOf('day')
       newObj.dueDate = dueDate
-      console.log('is group' , isGroup)
-      console.log("newObj.assignemtType" , newObj.assignemtType)
-
+    
+      console.log('newObj' , newObj)
       var asss
       Assignment.getOneAssignment(req.body.module , req.body.intake)
       .then(ass => {
+        console.log(ass , 'ass')
            asss =  ass
           if(ass.assignemtType === 'GROUP' && newObj.assignemtType !== 'GROUP'){
             GroupMember.findGroupsAndDelete(newObj.module , newObj.intake)
@@ -178,34 +179,36 @@ module.exports = app => {
     }
       Assignment.findAssignmentToUpdate(req.body.module , req.body.intake ,  newObj)
       .then(assignmented => {
-        Student.getEmails(newObj.intake)
-        .then(emails => {
-          sendEmailsUpdate(emails ,newObj )
-          
-          if(asss.assignemtType !== 'GROUP' && newObj.assignemtType === 'GROUP'){
-            console.log('assfsadf')
-            let min = req.body.min
-          let max = req.body.max
+        console.log('updates ' , assignmented)
+        // Student.getEmails(newObj.intake)
+        // .then(emails => {
+        //   sendEmailsUpdate(emails ,newObj )
+        return res.send('success')
+          // if(asss.assignemtType !== 'GROUP' && newObj.assignemtType === 'GROUP'){
+           
+          //   let min = req.body.min
+          // let max = req.body.max
      
-          var studentsNum = 0
-          emails.forEach(el => {
-            el.forEach(num => {
-              studentsNum++
-            })
-          })
+          // var studentsNum = 0
+          // emails.forEach(el => {
+          //   el.forEach(num => {
+          //     studentsNum++
+          //   })
+          // })
    
        
-          GroupMember.formGroups(min, max , studentsNum , newObj.module , newObj.intake)
-          .then(ss => res.send("success"))
-          .catch(e => res.status(400).send(e))
-          }
+          // GroupMember.formGroups(min, max , studentsNum , newObj.module , newObj.intake)
+          // .then(ss =>  res.send("success"))
+          // .catch(e => res.status(400).send(e))
+          // }
           
-        })
-        .catch(e => res.status(400).send(e))
-        res.send('success')
+        // })
+        // .catch(e => res.status(400).send(e))
+        return res.send('success')
+        
         
       })
-      .catch(e => res.status(400).send(e))
+      .catch(e => console.log("fail to update") || res.status(400).send(e))
 
     })
 

@@ -22,7 +22,7 @@ module.exports = {
     } ,
     LectuerAuth : (req , res , next) => {
         const {lecAuth } = require('../controller/auth/lecturer')
-        console.log('Middleware' , lecAuth )
+     
         var token = lecAuth  // change this later
         
        Lecturer.findByToken(token)

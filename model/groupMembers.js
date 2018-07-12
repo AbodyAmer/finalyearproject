@@ -50,11 +50,10 @@ groupMemeberSchema.methods.toJSON = function(){
 groupMemeberSchema.statics.formGroups = function(min, max , student , module ,intake){
     var GroupMember = this
     var groupArr = []
-    
     var iniGroups = parseInt(student/max)
     var studentRemind =  student -  iniGroups * max
    
-    console.log('lets create groups')
+   
     for(var i=1; i<=iniGroups; i++){
         groupArr.push(max)
     }

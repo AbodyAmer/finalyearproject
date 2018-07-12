@@ -12,12 +12,12 @@ var assignmentSchema = new mongoose.Schema({
         minlength:1,
         required:true
     }, 
-    assignemtType: {
+    assignemtType:{
         type:String,
         trim:true,
         minlength:1,
         required:true
-    } ,
+    },
     assignementTitle: {
         type:String,
         trim:true,
@@ -43,14 +43,15 @@ assignmentSchema.methods.toJSON = function(){
 assignmentSchema.statics.getOneAssignment = function(module , intake, username){
     var Assignment = this
 
+   
     return Assignment.findOne({module , intake, 'lecturer.username' : username})
     .then(assignment => {
        if(!assignment)
-         return Promise.reject('Assignment Not Found')
-      
+         return console.log('Assignment not found') || Promise.reject('Assignment Not Found')
+        console.log('Assignment found hola')
          return assignment
     })
-    .catch( e => Promise.reject("Assignment not found"))
+    .catch( e => console.log('error') || Promise.reject("Assignment not found"))
     
 }
 

@@ -4,7 +4,7 @@ const currentSelected = (state ={currentModule: null, currentIntakes: null }, ac
 
     switch(action.type){
        case select: 
-       return se = {
+       return {
            currentModule: action.module,
            currentIntakes: action.intakes
        }

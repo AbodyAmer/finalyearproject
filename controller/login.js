@@ -8,14 +8,14 @@ const {LectuerAuth} = require('../model/authenticateMiddlerware')
 module.exports = app => {
 
     let lecturerAuthToken = ''
-    app.post('/api/login', (req, res) => {
+    app.post('/api/login', async (req, res) => {
         const {username, password} = req.body
         
-        Student.login(username, password)
-        .then(student => {
-            user.generateAuthToken()
-            .then(token => {
-                modd(token)
+        await Student.login(username, password)
+        .then(async student => {
+            await user.generateAuthToken()
+            .then(async token => {
+                await modd(token)
               })
             .catch(e => {
                 res.status(401).send(e)})
