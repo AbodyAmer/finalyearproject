@@ -24,17 +24,13 @@ var gradesSchema = new mongoose.Schema({
         type:String, 
         trim:true,
         minlength:1
-    },
-    isApproved:{
-       type:Boolean,
-       required:true
     }
 })
 
 gradesSchema.methods.toJSON = function(){
     var grade = this
     var gradeObject = grade.toObject()
-    return _.pick(gradeObject , ['module' ,'studentTP' , 'grade' , 'feedback' , 'approval'])
+    return _.pick(gradeObject , ['module' ,'studentTP' , 'grade' , 'feedback' ])
 }
 
 gradesSchema.statics.getAssessment = function(module,studentTP ){

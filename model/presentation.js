@@ -50,7 +50,7 @@ var presentationSchema = new mongoose.Schema({
 presentationSchema.statics.getPresentations = function(module, intake){
     var Presentation = this
 
-    return Presentation.findOne({module, intake})
+    return Presentation.find({module, intake})
     .then(preset => {  
         if(preset.length === 0)
            return Promise.reject("Presentations not found")

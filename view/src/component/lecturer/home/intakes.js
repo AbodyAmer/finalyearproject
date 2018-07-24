@@ -48,7 +48,7 @@ function ListDividers(props) {
      <ListItem button className={classes.lists} key={intakes}>
             <ListItemText  primary={int(intakes)}  
             onClick={e =>{ 
-              console.log(props , " from stateless")
+              
               props.selected( props.moduled+ "."+ int(intakes))
               props.history.push('/form')
           }}

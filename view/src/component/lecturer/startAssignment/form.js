@@ -7,6 +7,13 @@ import {signout} from '../../../action/sharedActions'
 import axios from 'axios'
 import UpdateButtons from './update'
 import AlertExample from './message'
+import moment from 'moment'
+import DownloadContainer from '../downloadAssignment/container'
+import {withRouter, Link} from 'react-router-dom'
+import LoginContainer from '../../../container/container'
+
+
+
 
 
 class Form extends Component {
@@ -28,7 +35,8 @@ class Form extends Component {
             message: '', 
             min: 0, 
             max: 0,
-            show: false
+            show: false,
+            dueDate: null
         }
 
         this.handleClick = this.handleClick.bind(this)
@@ -40,30 +48,44 @@ class Form extends Component {
         this.startAssignment = this.startAssignment.bind(this)
         this.hide = this.hide.bind(this)
         this.updateAssignemnt = this.updateAssignemnt.bind(this)
+        this.componentWillUnmount = this.componentWillUnmount.bind(this)
+    }
+
+    componentWillUnmount(){
+        this.setState({didMount: false})
     }
 
     componentDidMount(){
-
+        if(this.props.reduxState.currentSelected.currentIntakes.length === 0){
+            console.log('i am zero')
+        }
+        
         var arr = this.props.reduxState.currentSelected.currentIntakes
-        arr.pop()
-
+       
+        if(!arr[arr.length-1]){
+            arr.pop()
+        }
+       
+        
         
         axios.post('/api/getassignment' , {intake: arr , modules: this.props.reduxState.currentSelected.currentModule})
         .then(res => {
-           console.log(res)
+           console.log('res')
            this.setState({
                title: res.data.assignementTitle, 
                type: res.data.assignemtType, 
                newAssignment: false, 
-               didMount:true
+               didMount:true,
+               dueDate: res.data.dueDate
            })
         })
         .catch(e => {
+            console.log('r')
             this.setState({didMount: true})
         }) 
-       
-
     }
+    
+   
    
     handleClick () {
         this.setState({open:true})
@@ -205,11 +227,34 @@ class Form extends Component {
         else if(ty === 'min'){
             this.setState({min:value})
         }
-     }
+    }
+    logout(){
+        console.log('hi logout from form')
+        axios.get('/api/logout/lecturer')
+        .then( res => {
+            console.log(res)
+            localStorage.clear()
+            console.log('this.props.history logout' , this.props.history)
+             this.props.signout()
+             this.props.history.push('/login')
+           
+        })
+        .catch(e => {
+        
+             console.log(e)
+        })
+    }
+
+    
     render(){
-        console.log(this.state , "from form")
+        console.log('/form/props' , this.props)
+        console.log('/form/state' , this.state)
         return(
+            
+            this.props.reduxState.sharedState.logged === false ?
+        <LoginContainer />:
             <Fragment>
+                
                 <MenuAppBar 
         open={this.state.open}
         handle={this.handleClick}
@@ -218,33 +263,48 @@ class Form extends Component {
          logout={this.logout}
         />
            <div className='container'>
+           
         
       {  
-         this.state.didMount?
+         this.state.didMount && 
+         moment(this.state.dueDate ,'YYYY-MM-DD').isAfter(moment(new Date(), 'YYYY-MM-DD'))?
+         <Fragment>
       <AssignmentForm 
         info={this.props.reduxState.currentSelected}
         states={this.state}
         handleChange={this.cha}
         click={this.upload}
         />  
-        :
-        <h1>Loading</h1>
-    }
-
-       { 
-        this.state.newAssignment && this.state.didMount?
+       { this.state.newAssignment?
         <ContainedButtons 
         startAssignment={this.startAssignment}
         />:
+        <UpdateButtons 
+        updateAssignment={this.updateAssignemnt}
+        />}
+        <Link to={'/presentation'}>Manage Presentations</Link>
+    </Fragment>
+    
+        :
+        this.state.didMount && 
+         moment(this.state.dueDate ,'YYYY-MM-DD').isBefore(moment(new Date(), 'YYYY-MM-DD'))?
+         <DownloadContainer 
+         type={this.state.type}
+         />
+         :
+        <h1>Loading</h1>
+    }
+
+       {/* { 
+          this.state.didMount?
+        :
         this.state.didMount?
         
      
-        <UpdateButtons 
-        updateAssignment={this.updateAssignemnt}
-        />
+        
       
         : console.log()
-        }
+        } */}
          {
          this.state.show?
          <AlertExample 
@@ -267,4 +327,4 @@ function mapStateToProps(state){
     }
 }
 
-export default connect(mapStateToProps , {signout})(Form)
+export default connect(mapStateToProps , {signout})(withRouter(Form))

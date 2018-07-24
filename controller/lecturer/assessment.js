@@ -21,7 +21,7 @@ module.exports = app => {
     })
 
     app.post('/api/assessIndividual' , Authenticate.LectuerAuth , (req, res) => {
-        var newAssessment = _.pick(req.body , ['module' ,'studentTP' , 'grade' , 'feedback' , 'isApproved'])
+        var newAssessment = _.pick(req.body , ['module' ,'studentTP' , 'grade' , 'feedback' ])
         
         var grade = new Grade(newAssessment)
         grade.saveAssessment()

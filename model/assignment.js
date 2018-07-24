@@ -48,7 +48,7 @@ assignmentSchema.statics.getOneAssignment = function(module , intake, username){
     .then(assignment => {
        if(!assignment)
          return console.log('Assignment not found') || Promise.reject('Assignment Not Found')
-        console.log('Assignment found hola')
+        
          return assignment
     })
     .catch( e => console.log('error') || Promise.reject("Assignment not found"))

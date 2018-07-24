@@ -14,7 +14,7 @@ module.exports = app => {
      
       const {intake , modules } = req.body
       const {lecturer} = req
-      console.log(modules , intake)
+      console.log(intake)
       Assignment.getOneAssignment(modules , intake, lecturer.username)
       .then(assignmented =>{
         const assignment = _.pick(assignmented , ['intake' , 'module' , 'assignemtType' , 'assignementTitle' ,'dueDate'])
@@ -55,6 +55,18 @@ module.exports = app => {
       else{
       res.send('Failed')
     }
+   })
+
+   app.post('/api/getGroupss', (req, res) => {
+
+    const {groupNum, intakes, moduled} = req.body
+      
+      GroupMember.getSpecificGroup(groupNum,moduled ,intakes)
+      .then(ress => res.send(ress))
+      .catch(e => res.status(400).send(e))
+
+
+
    })
 
 

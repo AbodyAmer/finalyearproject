@@ -7,6 +7,12 @@ import {withRouter} from 'react-router-dom'
 
 class LoginContainer extends Component{
     
+    componentWillMount() {
+        setTimeout(() => {
+          window.history.forward()
+        }, 0)
+        window.onunload=function(){null};
+     }
     
 
     render() {

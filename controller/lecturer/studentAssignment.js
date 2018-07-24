@@ -10,7 +10,6 @@ const mime = require('mime')
 const archiver = require('archiver')
 const zlip = require('zlib')
 
-
 module.exports = app => {
 
     app.post('/api/getStudentsAssignments' , Authenticate.LectuerAuth, (req, res) => {
@@ -18,7 +17,7 @@ module.exports = app => {
         let intake = req.body.intake
         let moduled = req.body.module
        
-        Assignment.getOneAssignment(moduled , intake)
+        Assignment.getOneAssignment(moduled , intake , req.lecturer.username)
         .then(assignment => {
             if(assignment.assignemtType === 'GROUP'){
 
@@ -28,9 +27,10 @@ module.exports = app => {
                     GroupMemeberSubmission.getGroupSubmission(moduled , intake)
                     .then(groupSubmission => {
 
-                    
+   
                     arrSubmission(groups ,groupSubmission , assignment.dueDate)
                     .then(arr => {
+                        arr = arr.map(a => a.filter(e => e!==null))
                         return res.send(arr)
                     })
                     .catch(e => res.status(400).send(e))
@@ -47,15 +47,10 @@ module.exports = app => {
 
                 Student.getStudentForAssignment(intake)
                 .then(students => {
-                  
                     IndividualAssignment.getIndividualSubmission(moduled , intake)
                     .then(individualAssignment => {
-                        //console.log("fdsf" ,individualAssignment.length )
                         let arrayList = []
-                        individualAssignment.map(ees =>  ees.map(single =>{
-                            arrayList = arrayList.concat(single)
-                        }))
-                        
+                        arrayList = individualAssignment.filter(e => e!==null)
                         individualSubmission(students , arrayList , assignment.dueDate)
                         .then(arrList => {
                             return res.send(arrList)
@@ -65,25 +60,18 @@ module.exports = app => {
                     .catch(e => res.status(400).send(e))
                 })
                 .catch(e => res.status(400).send(e))
-
             }
         })
         .catch(e => res.status(400).send(e))
     })
-
     function arrSubmission(groups , groupSubmission , assignmentduedate){
-         
-        
+        let tu =0
         var arr =  groups.map(element => 
              groupSubmission.map(gs => {
-               
-               
                  let sortElement = element.intake.sort()
                  let sortGs = gs.intake.sort()
-
                  var sameIntake= false
                  if(sortGs.length === sortElement.length){
- 
                     for(var i=0; i<sortElement.length; i++){
                      if(sortElement[i] !== sortGs[i]){
                         sameIntake = false
@@ -94,9 +82,9 @@ module.exports = app => {
                  }
                
                 }
-              
-                 if(element.groupNumber === gs.group && element.module === gs.module && sameIntake){
 
+                 if(element.groupNumber === gs.group && element.module === gs.module && sameIntake){
+                  
                     let submissiond = moment(gs.submissionDate , 'YYYY-MM-DD')
                     let dueDat = moment(assignmentduedate, 'YYYY-MM-DD').endOf('day')
                     let isLate = submissiond.isAfter(dueDat)
@@ -106,7 +94,7 @@ module.exports = app => {
                     }
                     else{
                         status = 'ontime'
-                    }
+                    } 
                     
                  
                     return obj = {
@@ -117,8 +105,13 @@ module.exports = app => {
                     }
                     
                 }
+
                 else{
-                     
+                    //// console.log(tu ,"===", element.groupNumber ,"===", gs.group ,"===", element.module ,"===", gs.module ,"===", sameIntake)
+                  if(element.groupNumber !== gs.group){
+                   return null
+                  }
+         
                 return  obj = {
                  groupNumber: element.groupNumber, 
                  submissionDate : null, 
@@ -135,8 +128,11 @@ module.exports = app => {
 
     function individualSubmission(students , submissions, duedate){
 
-        var arr = students.map(studented => studented.map(student =>  submissions.map(submission =>{
+       
+
+        var arr = students.map(studented => studented.map(student =>  submissions.map(submissione => submissione.map(submission => {
         
+           
             if(student.tp === submission.studentTP ){
                 let submissiond = moment(submission.submissionDate , 'YYYY-MM-DD')
                 let dueDat = moment(duedate, 'YYYY-MM-DD').endOf('day')
@@ -148,8 +144,10 @@ module.exports = app => {
                 else{
                     status = 'ontime'
                 }
+                
                 return obj = {
-                    studentName: `${student.name} ${student.tp}`, 
+                    studentName: `${student.name} `,
+                    tp: `${student.tp}`, 
                     submissionDate : submission.submissionDate, 
                     status
                 }
@@ -157,13 +155,9 @@ module.exports = app => {
 
             }
             else{
-                return  obj = {
-                    studentName: `${student.name} ${student.tp}`, 
-                    submissionDate : null, 
-                    status : 'none'
-                      }
+                return  null
                     }
-                })))
+                }))))
 
         return Promise.all(arr)
     }
@@ -172,10 +166,12 @@ module.exports = app => {
         let moduled = req.params.module
         let intake = req.params.intake
         let groupNumber = req.params.groupNum
+
+       
         fs.readdirSync(`./controller/files/answers/group/${intake}/${moduled}`).forEach(files => {
             let file = files.split('-')
             if(file[0] === groupNumber){
-               
+           
                 return res.download(`./controller/files/answers/group/${intake}/${moduled}/${files}`)
             }
         })
@@ -183,12 +179,17 @@ module.exports = app => {
     })
 
     app.get('/api/downloadSingleIndividual/:module/:intake/:studentTP' , Authenticate.LectuerAuth,(req, res) => {
+      console.log('download single')
         let moduled = req.params.module
         let intake = req.params.intake
         let studentTP = req.params.studentTP
 
+
+        console.log('req.params' ,  req.params)
+
         fs.readdirSync(`./controller/files/answers/individual/${intake}/${moduled}`).forEach(files => {
             let file = files.split('-')
+            console.log(file[0])
             if(file[0] === studentTP){   
                 return res.download(`./controller/files/answers/individual/${intake}/${moduled}/${files}`)
             }
@@ -233,15 +234,15 @@ module.exports = app => {
 
       var filePath = `./controller/files/answers/group/${intake}/${moduled}`
       var files = fs.readdirSync(filePath)
-      console.log("files" , files)
+      
       files.map(element => {
-        console.log("element " , element )
+       
          archive.append(fs.createReadStream(filePath+'/'+element), {name: element})
          
       })
       =
      await archive.finalize();
-      console.log(fPath)
+      
     
       return res.download(fPath)
    

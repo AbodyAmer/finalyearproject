@@ -1,7 +1,8 @@
 import {select} from '../../action/lecturer/mainPage'
 
-const currentSelected = (state ={currentModule: null, currentIntakes: null }, action) => {
+const currentSelected = (state ={}, action) => {
 
+  
     switch(action.type){
        case select: 
        return {

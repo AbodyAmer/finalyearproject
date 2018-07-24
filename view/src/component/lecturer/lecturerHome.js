@@ -8,9 +8,6 @@ import LoginContainer from '../../container/container'
 import SimpleExpansionPanel from './home/modulesList'
 
 
-
-
-
 class LecturerHome extends Component{
 
     constructor(props){
@@ -25,8 +22,10 @@ class LecturerHome extends Component{
         this.closeMenu  = this.closeMenu .bind(this)
         this.logout = this.logout.bind(this)
         this.componentDidMount = this.componentDidMount.bind(this)
+      
     }
 
+   
     
     componentDidMount(){
          axios.get('/api/lecturer/getModuleList')
@@ -49,7 +48,7 @@ class LecturerHome extends Component{
         .then( res => {
             console.log(res)
             localStorage.clear()
-            console.log('this.props.history' , this.props.history)
+            console.log('this.props.history logout' , this.props.history)
              this.props.signout()
              this.props.history.push('/login')
            
@@ -69,7 +68,8 @@ class LecturerHome extends Component{
             
             <Fragment>
        { this.props.reduxState.sharedState.logged === false ?
-        <LoginContainer />:
+        <LoginContainer />
+        :
         <Fragment>
            <MenuAppBar 
         open={this.state.open}
@@ -83,7 +83,6 @@ class LecturerHome extends Component{
         
        <SimpleExpansionPanel 
        modules={this.state.modules}
-       
        />
        
     

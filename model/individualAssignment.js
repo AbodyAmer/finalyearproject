@@ -39,7 +39,7 @@ individualAssignmentSchema.statics.getIndividualSubmission = function(module , i
 
     
      var arr = intakes.map( intake =>  IndividualAssignment.find({module , intake})
-    .then(students => students.map(student => student))
+    .then(students =>  students)
     .catch(e => e))
 
     return Promise.all(arr)

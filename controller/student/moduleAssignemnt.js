@@ -30,7 +30,7 @@ module.exports = app => {
             let {groupNumber} = group
             let submission = await GroupMemeberSubmission.getOneSubmission(groupNumber, moduleName , intake)
             let assignmentObj = _.pick(assignment , ['intake' , 'assignementTitle' , 'assignemtType' , 'module' , 'lecturer.name'])
-               console.log('assignmentObj' , assignmentObj)
+               
                obj.expired = expired
                obj.submission = submission
                obj.assignment = assignmentObj

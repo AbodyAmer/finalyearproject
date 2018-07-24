@@ -12,5 +12,6 @@ export const selected = (moduleIntake) => {
     for(let i=1; i<div.length; i++){
         action.intakes = action.intakes.concat(div[i])
     }
+    console.log('action ' , action.intakes)
     return action
 }
