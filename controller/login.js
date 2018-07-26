@@ -4,18 +4,22 @@ const {Student} = require('../model/student')
 const _ = require('lodash')
 let {lecAuth , mod} = require('./auth/lecturer')
 let {studentAuth , modd} = require('./auth/student')
-const {LectuerAuth} = require('../model/authenticateMiddlerware')
+const {LectuerAuth, StudentAuth} = require('../model/authenticateMiddlerware')
 module.exports = app => {
 
     let lecturerAuthToken = ''
     app.post('/api/login', async (req, res) => {
         const {username, password} = req.body
         
-        await Student.login(username, password)
-        .then(async student => {
-            await user.generateAuthToken()
-            .then(async token => {
-                await modd(token)
+        
+         Student.login(username, password)
+        .then( student => {
+            
+            student.generateAuthToken()
+            .then( token => {
+                
+                 modd(token)
+                 
               })
             .catch(e => {
                 res.status(401).send(e)})
@@ -61,7 +65,7 @@ module.exports = app => {
     })
 
     app.get('/api/logout/lecturer', LectuerAuth ,(req,res) => {
-      console.log('logging out')
+      
       const lecturer = req
 
       var lec = new Lecturer(lecturer)
@@ -70,4 +74,14 @@ module.exports = app => {
       .catch(e => res.status(400).send(e))
        
     })
+    app.get('/api/logout/student', StudentAuth ,(req,res) => {
+        
+        const student = req
+        
+        var lec = new Student(student)
+        lec.logout()
+        .then(l => res.send('OK'))
+        .catch(e => res.status(400).send(e))
+         
+      })
 }

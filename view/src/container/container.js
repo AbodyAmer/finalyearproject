@@ -1,7 +1,6 @@
 import React, {Component , Fragment} from 'react'
 import {connect} from 'react-redux'
 import Login from '../component/login/login'
-import LecturerHome from '../component/lecturer/lecturerHome'
 import {withRouter} from 'react-router-dom'
 
 
@@ -25,10 +24,14 @@ class LoginContainer extends Component{
               
               this.props.history.push('/lecturer')
             }
+            else if(this.props.reduxState.sharedState.user.role === 'student'){
+                this.props.history.push('/student')
+            }
+
           }
 
 
-          console.log('I am back')
+          
         return (
             <Fragment>
 

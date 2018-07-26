@@ -46,9 +46,7 @@ class LecturerHome extends Component{
 
         axios.get('/api/logout/lecturer')
         .then( res => {
-            console.log(res)
             localStorage.clear()
-            console.log('this.props.history logout' , this.props.history)
              this.props.signout()
              this.props.history.push('/login')
            

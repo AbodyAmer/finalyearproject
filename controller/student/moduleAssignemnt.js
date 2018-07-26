@@ -11,6 +11,63 @@ const mime = require('mime')
 
 module.exports = app => {
 
+
+    app.post('/api/getOneindiSubmission' , StudentAuth, async (req, res) =>{
+        let {tp, intake, modules} = req.body
+        try{
+
+            let submission = await IndividualAssignment.getIndividualSubmission( modules, intake, tp)
+            res.send('success')
+        }
+        catch(e){
+            res.status(400).send(e)
+        }
+    })
+
+    app.post('/api/getOneSubmission', StudentAuth, async (req, res) => {
+        let {groupNumber, intake, modules} = req.body
+
+        try{
+           
+            let submission = await GroupMemeberSubmission.getOneSubmission(groupNumber,  modules, intake )
+            res.send('success')
+        }
+        catch(e){
+           res.status(400).send(e)
+        }
+    })
+    app.post('/api/getGroupInfo' , StudentAuth, async (req, res) => {
+
+        let {tp, moduleName} = req.body
+        try{
+        let group = await GroupMember.getOneGroup(  tp,  moduleName)
+        res.send(group)
+        }
+        catch(e){
+           res.status(400).send(e)
+        }
+    })
+    app.post('/api/getOneAssignment' , StudentAuth , async (req, res) =>{
+        let  {moduleName, intake} = req.body
+        let assignment 
+        try{
+             assignment = await Assignment.getOneAssignmentStudent(moduleName , intake)
+            
+            let expired = moment(assignment.dueDate , 'YYYY-MM-DD').endOf('day').isBefore(moment(new Date() , 'YYYY-MM-DD'))
+            assignment.expired = expired
+          
+            let assignmentl = _.pick(assignment, ['expired' , 'intake' , 'assignemtType' , 'assignementTitle','module' , 'dueDate'])
+              
+              res.send(assignmentl)
+        }
+        catch(e){
+            
+            res.status(404).send(e)
+        }
+       
+        
+    })
+
     app.post('/api/assignmentModule' , StudentAuth , async (req, res) => {
 
         let {moduleName, intake, studentTP} = req.body
@@ -36,6 +93,7 @@ module.exports = app => {
                obj.assignment = assignmentObj
                obj.group = group
         }
+  
     }
     catch(err) { 
        obj.note = err
@@ -46,11 +104,11 @@ module.exports = app => {
     })
 
     app.get('/api/downloadAssignmentQuestion/:module/:intake' ,StudentAuth , (req , res) => {
-        
+        console.log('req.params.intake' , req.params.intake)
         let fpath = `./controller/files/questions/${req.params.intake}`
         fs.readdirSync(fpath).forEach(file => {
             let fileName = file.split('.')
-
+            
             if(fileName[0] === req.params.module){
                 return res.download(fpath+'/'+file)
             }

@@ -14,7 +14,7 @@ var late={
 class DownloadAssignments extends Component {
   render() {
 
-  console.log("ptop" , this.props.allintakes)
+ 
     return (
       <div>
       <Table bordered>

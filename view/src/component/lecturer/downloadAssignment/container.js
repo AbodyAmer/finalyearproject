@@ -24,7 +24,7 @@ class DownloadContainer extends Component{
            if(this.props.type !== 'GROUP'){
                arr = res.data[0].map(ee => ee.map(onlyOne => onlyOne.filter(a => a !==null)))
                
-               console.log('arr', arr)
+               
                this.setState({assignments: arr , didMount: true})
                return
            }
@@ -33,7 +33,7 @@ class DownloadContainer extends Component{
     }
 
     render(){
-        console.log('from download' , this.state)
+        
         return(
 
         this.state.didMount?

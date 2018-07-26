@@ -27,7 +27,7 @@ class PresentationContainer extends Component{
          this.setState({open:false})
      }
     logout(){
-       console.log('log out')
+       
         axios.get('/api/logout/lecturer')
         .then( res => {
             console.log(res)

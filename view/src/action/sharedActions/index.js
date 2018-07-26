@@ -2,7 +2,7 @@ export const login = 'LOGIN'
 export const logout = 'LOGOUT'
 
 export const signin = (user) => {
- console.log('action')
+
     const action = {
         type: login,
         user

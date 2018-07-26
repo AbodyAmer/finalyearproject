@@ -36,7 +36,12 @@ moduleSchema.statics.getModules = function(lecturer){
    .catch(e => e)
 
 }
-
+moduleSchema.statics.findIntakeMod = function(intake){
+    
+    return this.find({intake})
+    .then(modules => modules? modules: Promise.reject("Modules not found"))
+    .catch(e => e)
+}
 moduleSchema.statics.findIntakeModules = function(intakes, name){
    
     return Promise.all(intakes.map(intake => this.find({intake , name}).then(mods => {

@@ -6,7 +6,7 @@ const {Admin} = require('./admin')
 
 module.exports = {
      StudentAuth : (req , res , next) => {
-        let {studentAuth } = require('./auth/student')
+        let {studentAuth } = require('../controller/auth/student')
        var token = studentAuth
        
        Student.findByToken(token)

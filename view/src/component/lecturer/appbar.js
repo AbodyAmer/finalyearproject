@@ -24,9 +24,9 @@ const styles = {
 
 function MenuAppBar(props) {
 
-  console.log('props ' , props)
+ 
      const { classes} = props;
-       console.log('classes' , classes)
+   
    
 
     return (

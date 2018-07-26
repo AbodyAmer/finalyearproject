@@ -34,6 +34,15 @@ individualAssignmentSchema.methods.toJSON = function(){
     return _.pick(iniAssignemntObject , ['studentTP' , 'intake' , 'module' ,'submissionDate' ,'dueDate' ])
 }
 
+individualAssignmentSchema.statics.getIndividualSubmission = function(module , intakes, tp){
+    var IndividualAssignment = this
+
+    IndividualAssignment.findOne({studentTP: tp, module , intakes })
+    .then(assignment => assignment? assignment: Promise.reject('Not found'))
+    .catch(e => e)
+
+}
+
 individualAssignmentSchema.statics.getIndividualSubmission = function(module , intakes){
     var IndividualAssignment = this
 
@@ -43,13 +52,7 @@ individualAssignmentSchema.statics.getIndividualSubmission = function(module , i
     .catch(e => e))
 
     return Promise.all(arr)
-    
-
-    
-
-   
-   
-
+ 
 }
 
 var IndividualAssignment = mongoose.model('IndividualAssignment' , individualAssignmentSchema)

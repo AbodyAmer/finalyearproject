@@ -1,7 +1,9 @@
 import {createStore , combineReducers} from 'redux'
 import sharedState from './sharedState'
+import studentSelect from './student/studentselect'
 import currentSelected from './lecturer/select'
 import assignmentStarted from './lecturer/startAssignment'
+
 
 function saveToLocalStorage(state) {
     try {
@@ -27,6 +29,7 @@ function saveToLocalStorage(state) {
     sharedState,
     currentSelected, 
     assignmentStarted,
+    studentSelect
   })
 
   const persistedState = loadFromLocalStorage()

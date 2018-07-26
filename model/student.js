@@ -84,13 +84,12 @@ studentschema.pre('save' , function(next){
 
 
 studentschema.statics.login = function(tp , password){
-    
     var Student = this
     return Student.findOne({tp})
     .then(student => {
         if(!student)
           return Promise.reject("Username or password is incorrect")
-
+          
           return bcrypt.compare(password , student.password)
           .then(res => {
               if(res)

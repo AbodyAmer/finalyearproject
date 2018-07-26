@@ -4,7 +4,6 @@ const sharedState = (state= {logged: false, user:null} , action) => {
 
     switch(action.type){
         case login: 
-        console.log('reducer')
         const user = action.user
         return  {
              logged: true,

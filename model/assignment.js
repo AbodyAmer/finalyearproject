@@ -40,6 +40,21 @@ assignmentSchema.methods.toJSON = function(){
     return _.pick(assignmentObject , ['intake' , 'module' , 'lecturer' , 'dueDate'])
 }
 
+assignmentSchema.statics.getOneAssignmentStudent = function(module , intake){
+    var Assignment = this
+
+   
+    return Assignment.findOne({module , intake})
+    .then(assignment => {
+       if(!assignment)
+         return console.log('Assignment not found') || Promise.reject('Assignment Not Found')
+        
+         return assignment
+    })
+    .catch( e => console.log('error') || Promise.reject("Assignment not found"))
+    
+}
+
 assignmentSchema.statics.getOneAssignment = function(module , intake, username){
     var Assignment = this
 

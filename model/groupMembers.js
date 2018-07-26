@@ -142,7 +142,7 @@ groupMemeberSchema.statics.getGroups = function(module , intake){
 
 
 groupMemeberSchema.statics.getOneGroup = function(tp , module) {
-
+   
     return this.findOne({module , "students.tp": tp}).then(group => {
         if(!group)
           return Promise.reject('No group Found')
@@ -152,7 +152,7 @@ groupMemeberSchema.statics.getOneGroup = function(tp , module) {
 
 groupMemeberSchema.statics.getSpecificGroup = function(groupNumber, module, intake){
 
-   console.log('groupNumber ' , groupNumber, 'module ' , module, 'intake ' , intake)
+   
     return this.findOne({groupNumber, module, intake}).then(group => {
         if(!group)
          return Promise.reject('No group found')

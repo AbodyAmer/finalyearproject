@@ -14,7 +14,7 @@ module.exports = app => {
      
       const {intake , modules } = req.body
       const {lecturer} = req
-      console.log(intake)
+      
       Assignment.getOneAssignment(modules , intake, lecturer.username)
       .then(assignmented =>{
         const assignment = _.pick(assignmented , ['intake' , 'module' , 'assignemtType' , 'assignementTitle' ,'dueDate'])

@@ -5,11 +5,11 @@ import TextField from '@material-ui/core/TextField';
 import ContainedButtons from './button'
 import CircularIndeterminate from './progress'
 import {signin} from '../../action/sharedActions'
-import CustomizedSnackbars from './errormessage'
 import {connect} from 'react-redux'
 import axios from 'axios'
 import AlertExample from './errormessage'
-import {Redirect} from 'react-router-dom'
+
+
 const styles = theme => ({
   container: {
     display: 'block',
@@ -54,7 +54,17 @@ class TextFields extends React.Component {
         axios.post('/api/login' , {username : this.state.username, password: this.state.password})
         .then(res => {
           
+          
            this.props.signin(res.data)
+           if(res.data.role === 'student'){
+            let intakes = []
+            intakes = intakes.concat(res.data.currentIntake)
+            res.data.previousIntakes.map(int => {
+                intakes = intakes.concat(int)
+            })
+
+          
+        }
           
           })
         .catch(e => {
