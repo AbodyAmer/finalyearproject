@@ -25,10 +25,10 @@ mongoose.connect('mongodb://localhost:27017/FinalYearProject')
 
 let lec 
 app.post('/createStudent' , (req, res) => {
-  //  var student = _.pick(req.body , ['tp' , 'name' , 'currentIntake' , 'previousIntakes' , 'password' , 'email'])
-      var lecturer = _.pick(req.body , ['username' , 'name' , 'email' , 'password']) 
+    var student = _.pick(req.body , ['tp' , 'name' , 'currentIntake' , 'previousIntakes' , 'password' , 'email'])
+    //  var lecturer = _.pick(req.body , ['username' , 'name' , 'email' , 'password']) 
  //  var admin = _.pick(req.body , ['username' , 'password'])
- let newstudent = new Lecturer(lecturer)
+ let newstudent = new Student(student)
     newstudent.save().then(user => {
         lec = user
         res.send(user)}) 

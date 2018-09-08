@@ -43,6 +43,7 @@ assignmentSchema.methods.toJSON = function(){
 assignmentSchema.statics.getOneAssignmentStudent = function(module , intake){
     var Assignment = this
 
+    
    
     return Assignment.findOne({module , intake})
     .then(assignment => {

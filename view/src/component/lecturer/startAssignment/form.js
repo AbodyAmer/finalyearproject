@@ -99,7 +99,7 @@ class Form extends Component {
  
          axios.get('/api/logout/lecturer')
          .then( res => {
-             console.log(res)
+
              localStorage.clear()
              console.log('this.props.history' , this.props.history)
               this.props.signout()
@@ -131,7 +131,8 @@ class Form extends Component {
             formData.append('_method', 'POST');
         
             if(this.state.type !== 'GROUP'){
-            axios.post('/api/uploadfile', formData)
+            axios.post('/api/uploadfile', formData , {'headers': {intake:this.state.intake, 
+                module: this.props.reduxState.currentSelected.currentModule}})
             axios.post('/api/startAssignemnt' , {
                 'assignementTitle':  this.state.title
                 , 'assignemtType': this.state.type
@@ -154,7 +155,8 @@ class Form extends Component {
                 this.setState({message: 'Max member should be larger than min member' , show:true})
                 return
             }
-            axios.post('/api/uploadfile', formData)
+            axios.post('/api/uploadfile', formData, {'headers': {intake:this.state.intake, 
+                module: this.props.reduxState.currentSelected.currentModule}})
             axios.post('/api/startAssignemnt' , {
                 'assignementTitle':  this.state.title
                 , 'assignemtType': this.state.type
@@ -267,7 +269,7 @@ class Form extends Component {
         
       {  
          this.state.didMount && 
-         moment(this.state.dueDate ,'YYYY-MM-DD').isAfter(moment(new Date(), 'YYYY-MM-DD'))?
+         (moment(this.state.dueDate ,'YYYY-MM-DD').isAfter(moment(new Date(), 'YYYY-MM-DD')) || this.state.dueDate=== null)?
          <Fragment>
       <AssignmentForm 
         info={this.props.reduxState.currentSelected}

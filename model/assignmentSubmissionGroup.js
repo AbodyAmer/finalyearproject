@@ -41,5 +41,13 @@ groupAssignmentSubmissionSchema.statics.getOneSubmission = function(group, modul
     })
 }
 
+groupAssignmentSubmissionSchema.statics.getOneSubmissionAndUpdate = function(group, module , intake, newOne){
+
+    return this.findOneAndUpdate({group, module , intake} , newOne).then(submission => {
+        if(!submission)
+            return Promise.reject('No submission')
+        return submission
+    })
+}
 var GroupMemeberSubmission = mongoose.model('GroupMemeberSubmission' , groupAssignmentSubmissionSchema)
 module.exports = {GroupMemeberSubmission}

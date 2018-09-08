@@ -11,7 +11,7 @@ module.exports = app => {
     app.post('/api/login', async (req, res) => {
         const {username, password} = req.body
         
-        
+
          Student.login(username, password)
         .then( student => {
             

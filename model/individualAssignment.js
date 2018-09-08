@@ -43,6 +43,17 @@ individualAssignmentSchema.statics.getIndividualSubmission = function(module , i
 
 }
 
+
+individualAssignmentSchema.statics.getIndividualSubmissionAndUpdate = function(module , intakes, tp, newOne){
+    var IndividualAssignment = this
+
+    IndividualAssignment.findOneAndUpdate({studentTP: tp, module , intakes }, newOne)
+        .then(assignment => assignment? assignment: Promise.reject('Not found'))
+        .catch(e => e)
+
+}
+
+
 individualAssignmentSchema.statics.getIndividualSubmission = function(module , intakes){
     var IndividualAssignment = this
 

@@ -8,15 +8,36 @@ const moment = require('moment')
 const _ = require('lodash')
 const fs = require('fs')
 const mime = require('mime')
+const {Grade} = require('../../model/grades')
 
 module.exports = app => {
 
 
+    app.post('/api/result' ,StudentAuth, async (req, res) =>{
+
+        const {tp, modules} = req.body
+
+        console.log(tp, modules)
+        try{
+
+            const result = await Grade.getAssessment(modules, tp)
+
+            res.send(result)
+        }
+        catch(e){
+            res.status(400).send(e)
+        }
+    })
+
     app.post('/api/getOneindiSubmission' , StudentAuth, async (req, res) =>{
         let {tp, intake, modules} = req.body
+        
         try{
 
             let submission = await IndividualAssignment.getIndividualSubmission( modules, intake, tp)
+            if(submission[0].length === 0){
+                throw new error('not found')
+            }
             res.send('success')
         }
         catch(e){
@@ -106,25 +127,121 @@ module.exports = app => {
     app.get('/api/downloadAssignmentQuestion/:module/:intake' ,StudentAuth , (req , res) => {
         console.log('req.params.intake' , req.params.intake)
         let fpath = `./controller/files/questions/${req.params.intake}`
-        fs.readdirSync(fpath).forEach(file => {
+        let intake = req.params.intake.split(',')
+        console.log('inatke[0] ' , intake[0])
+        fs.readdirSync('./controller/files/questions/'+intake[0]).forEach(file => {
             let fileName = file.split('.')
             
             if(fileName[0] === req.params.module){
-                return res.download(fpath+'/'+file)
+                return res.download('./controller/files/questions/'+intake[0]+'/'+file)
             }
         }) 
     })
 
-    app.post('/api/uploadQuestion/:type/:module/:intake/:student' , StudentAuth , async (req, res) =>{
-
-      
-        
+    app.post('/api/uploadQuestionupdate/:type/:module/:intake/:student' ,  StudentAuth , async (req, res) => {
         let url = ''
         if(req.files){
-          
+            console.log('file exit')
             if(req.params.type === 'GROUP'){
                 url = `./controller/files/answers/group/${req.params.intake}/${req.params.module}`
-             
+                console.log('it is a group')
+                let ext = mime.getExtension(req.files.file.mimetype)
+                let name = req.params.student + '.' + ext
+                try{
+
+                    fs.mkdirSync(url , 0o776)
+                }
+                catch(e){
+
+                }
+
+                fs.readdirSync(url).map(fileName => {
+
+                    let fname = fileName.split('.')
+                    if(fname[0] === req.params.student){
+                        fs.unlinkSync(`${url}/${fileName}`)
+                    }
+                })
+
+                req.files.file.mv(`${url}/${name}`)
+                let intake = req.params.intake.split(',')
+                let newGroupSubmission = {
+                    group: req.params.student,
+                    submissionDate: moment(new Date() , 'YYYY-MM-DD'),
+                    module: req.params.module,
+                    intake
+                }
+
+
+
+
+                try {
+
+                   let obj = await GroupMemeberSubmission.getOneSubmissionAndUpdate(req.params.student, req.params.module, req.params.intake, newGroupSubmission)
+
+                    res.send(obj)
+                }
+                catch(e){
+                    res.status(400).send(e)
+                }
+
+
+
+            }
+            else{
+                url = `./controller/files/answers/individual/${req.params.intake}/${req.params.module}`
+                let ext = mime.getExtension(req.files.file.mimetype)
+                let name = req.params.student + '.' + ext
+                try{
+
+                    fs.mkdirSync(url , 0o776)
+                }
+                catch(e){
+
+                }
+
+                fs.readdirSync(url).map(fileName => {
+
+                    let fname = fileName.split('.')
+                    if(fname[0] === req.params.student){
+                        fs.unlinkSync(`${url}/${fileName}`)
+                    }
+                })
+
+                req.files.file.mv(`${url}/${name}`)
+
+                let intake = req.params.intake.split(',')
+
+                let newSubmission = {
+                    studentTP: req.params.student,
+                    submissionDate: moment(new Date() , 'YYYY-MM-DD'),
+                    module: req.params.module,
+                    intake
+                }
+
+
+                try {
+                    let obj = await IndividualAssignment.getIndividualSubmissionAndUpdate(req.params.module , req.params.intake  , req.params.student, newSubmission)
+                    res.send(obj)
+                }
+                catch(e){
+                    res.status(400).send(e)
+                }
+
+            }
+        }
+    })
+
+    app.post('/api/uploadQuestion/:type/:module/:intake/:student' , StudentAuth , async (req, res) =>{
+
+        console.log('Upload file ' , req.params.intake)
+      
+        let url = ''
+        if(req.files){
+          console.log('file exit')
+            if(req.params.type === 'GROUP'){
+                url = `./controller/files/answers/group/${req.params.intake}/${req.params.module}`
+                console.log('it is a group')
                 let ext = mime.getExtension(req.files.file.mimetype)
                 let name = req.params.student + '.' + ext
                 try{
@@ -159,16 +276,24 @@ module.exports = app => {
 
             }
             else{
-                url = `./controller/files/answers/individual/${req.params.intake}/${req.params.module}`
+                url = `./controller/files/answers/individual/${req.params.intake}`
                 let ext = mime.getExtension(req.files.file.mimetype)
                 let name = req.params.student + '.' + ext
                 try{
                     
                     fs.mkdirSync(url , 0o776)
+                    
                 }
                 catch(e){
-       
+                         console.log('e ', e)
                 } 
+
+                try{
+                    fs.mkdirSync(url+ `/${req.params.module}` , 0o776)
+                }
+                catch(e){
+
+                }
 
                 fs.readdirSync(url).map(fileName => {
 
@@ -178,7 +303,7 @@ module.exports = app => {
                     }
                 })
         
-                req.files.file.mv(`${url}/${name}`)
+                req.files.file.mv(`${url}/${req.params.module}/${name}`)
                 
                 let intake = req.params.intake.split(',')
 
@@ -201,16 +326,14 @@ module.exports = app => {
     app.post('/api/getGroup' ,StudentAuth , async (req, res) => {
 
         let {moduled, intakes} = req.body
-        
+
         try{
 
             let groups = await GroupMember.getGroups(moduled, intakes)
-            if(groups.length === 0){
-                throw new Error('Groups not found')
-            }
-            else{
-            return res.send(groups)
-            }
+            let g = groups.map(gg => _.pick(gg , ['groupNumber' , 'studentNum' , 'students']))
+
+            return res.send(g)
+
 
         }
         catch(err){
@@ -263,22 +386,46 @@ module.exports = app => {
     })
 
     app.post('/api/book' , StudentAuth , async (req, res) => {
-        let {moduled, intake, slot} = req.body
-   
+        let {moduled, intake, slot, date, tp, start} = req.body
+        try {
         let presentations = await Presentation.getPresentations(moduled, intake)
-         let slotsP = await presentations.slot.map(s => {
-             if(s.start === slot.start && s.end === slot.end)
-                 return {
-                     tp: slot.tp, 
-                     start: slot.start, 
-                     end: slot.end
-                 }
-             return s
-         })
-         let updatedPresentaions = await Presentation.updateOnePresentation(moduled, intake, slotsP)
-         
-         let presentationss = await Presentation.getPresentations(moduled, intake)
-         res.send(presentationss)
+            let slotsP = await presentations.map(slots => slots.slot.map(s => {
+                console.log(slots.date ,'===' , date ,'&&',  s.start ,'===', slot)
+                if (  s.start === slot) {
+                    if(moment(slots.date).isSame(moment(date))) {
+                        let ss  = {
+                            tp,
+                            start: s.start,
+                            end: s.end
+                        }
+                        return ss
+                    }
+                    return _.pick(s , ['tp' , 'start','end'])
+                }
+
+                return _.pick(s , ['tp' , 'start','end'])
+            }))
+            presentations.slot = slotsP
+            let updatedPresentaions = await Presentation.updateOnePresentation(moduled, intake, start, presentations.slot)
+            let presentationss = await Presentation.getPresentations(moduled, intake)
+            res.send(presentationss)
+        }
+        catch(e){
+            res.status(400).send(e)
+        }
        
+    })
+
+    app.post('/api/getPresentationStudent' , StudentAuth , async (req, res) =>{
+        let {intake, modules} = req.body
+
+        try{
+            let presentations = await Presentation.getPresentations(modules, intake)
+
+            res.send(presentations)
+        }
+        catch(e){
+            res.status(400).send(e)
+        }
     })
 }

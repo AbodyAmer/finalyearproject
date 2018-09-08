@@ -8,7 +8,6 @@ module.exports = {
      StudentAuth : (req , res , next) => {
         let {studentAuth } = require('../controller/auth/student')
        var token = studentAuth
-       
        Student.findByToken(token)
        .then(student => {
            if(!student)
@@ -22,9 +21,7 @@ module.exports = {
     } ,
     LectuerAuth : (req , res , next) => {
         const {lecAuth } = require('../controller/auth/lecturer')
-     
-        var token = lecAuth  // change this later
-        
+        var token = lecAuth  // change this later  
        Lecturer.findByToken(token)
        .then(lecturer => {
            if(!lecturer)

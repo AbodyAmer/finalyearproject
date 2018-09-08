@@ -7,10 +7,10 @@ import PresentationContainer from './component/lecturer/presentations/presentati
 import AssessmentContainer from './component/lecturer/assessment/assessmentContainer'
 import HomePageStudent from './component/student/homepage'
 import AssignmentContainer from './component/student/home/assignmentPage/assignmentContainer'
-
+import GroupContainer from './component/student/groups/groupContainer'
+import StudentPresentationContainer from './component/student/presentations/presentationContainer'
 
 class App extends Component{
-
     render(){
         return(
       <Router history={history}>
@@ -23,6 +23,8 @@ class App extends Component{
             <Route exact path= '/assessment' component={AssessmentContainer} />
             <Route exact path= '/student' component={HomePageStudent} />
             <Route exact path= '/studentForm' component={AssignmentContainer} />
+            <Route exact path= '/studentGroups' component={GroupContainer} />
+            <Route exact path= '/studentPresentations' component={StudentPresentationContainer} />
             <Route render={()=>{
                     return(
                         <LoginContainer />

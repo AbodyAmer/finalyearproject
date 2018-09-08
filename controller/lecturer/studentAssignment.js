@@ -16,9 +16,10 @@ module.exports = app => {
         
         let intake = req.body.intake
         let moduled = req.body.module
-       
+       console.log('get assignment ' , intake, moduled)
         Assignment.getOneAssignment(moduled , intake , req.lecturer.username)
         .then(assignment => {
+            
             if(assignment.assignemtType === 'GROUP'){
 
                 GroupMember.getGroups(moduled , intake)
@@ -47,6 +48,7 @@ module.exports = app => {
 
                 Student.getStudentForAssignment(intake)
                 .then(students => {
+                    console.log()
                     IndividualAssignment.getIndividualSubmission(moduled , intake)
                     .then(individualAssignment => {
                         let arrayList = []

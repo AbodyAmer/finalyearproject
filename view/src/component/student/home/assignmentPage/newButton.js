@@ -3,7 +3,9 @@ import { Button } from 'reactstrap';
 
 function NewButton(props){
     return(
-    <Button>Submit</Button>)
+    <Button
+    onClick={e =>  props.newSubmision()}
+    >Submit</Button>)
 }
 
 export default NewButton

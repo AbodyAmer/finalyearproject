@@ -3,7 +3,9 @@ import { Button } from 'reactstrap';
 
 function UpdateButton(props){
      return(
-    <Button>Update Submission</Button>)
+    <Button
+    onClick={e => props.updateSubmission()}
+    >Update Submission</Button>)
 }
 
 export default UpdateButton

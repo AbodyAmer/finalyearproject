@@ -65,8 +65,14 @@ presentationSchema.methods.createPresentation = function(){
     return presentation.save()
 }
 
-presentationSchema.statics.updateOnePresentation = function(module, intake, slot){
-    return this.findOneAndUpdate({module, intake} , {slot})
+presentationSchema.statics.updateOnePresentation = function(module, intake, start, slot){
+     
+    return this.findOneAndUpdate({module, start ,intake} , {
+        slot: slot[0]
+    })
+        .then(res => console.log(res) || res)
+        .catch(e => e)
+
 }
 
 

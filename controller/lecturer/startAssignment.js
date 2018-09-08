@@ -25,6 +25,8 @@ module.exports = app => {
 
     app.post('/api/uploadfile', (req , res) => {
      
+
+      
       if(req.files){
 
         let ext = mime.getExtension(req.files.file.mimetype)
@@ -71,12 +73,8 @@ module.exports = app => {
 
 
     app.post('/api/startAssignemnt' , Authenticate.LectuerAuth ,   (req, res) => {
-       
-     
       var assignments = _.pick(req.body , ['assignementTitle' , 'assignemtType' , 'module' , 'intake'])
-      
       assignments.lecturer = req.lecturer
-      
       var dueDate = moment(req.body.dueDate, 'YYYY-MM-DD').endOf('day')
       assignments.dueDate = dueDate
       var now = moment(new Date() , 'YYYY-MM-DD').endOf('day')
@@ -88,22 +86,17 @@ module.exports = app => {
       .then( newAssignmetn => {
        Student.getEmails(newAssignmetn.intake)
        .then(emails => {
-
         sendEmails(emails , newAssignmetn)
-         
         if(newAssignmetn.assignemtType === 'GROUP'){
           let min = req.body.min
           let max = req.body.max
-
           var studentsNum = 0
           emails.forEach(el => {
             el.forEach(num => {
               studentsNum++
             })
           })
-         
           GroupMember.formGroups(min, max , studentsNum , newAssignmetn.module , newAssignmetn.intake )
-
         }
 
         
