@@ -20,16 +20,25 @@ class DownloadContainer extends Component{
             "module": this.props.reduxSatet.currentSelected.currentModule
        })
        .then(res => {
+           console.log('Hellooooo')
            let arr = []
            if(this.props.type !== 'GROUP'){
+               console.log('res.data ' , res.data)
                arr = res.data[0].map(ee => ee.map(onlyOne => onlyOne.filter(a => a !==null)))
-               
+               console.log('arr ' , arr[1][0].length)
+               arr = arr.map(a => a.filter(b => b.length !== 0))
+               arr = arr.filter(a => a.length !==0)
+               console.log('arr after' ,arr)
                
                this.setState({assignments: arr , didMount: true})
                return
            }
-        this.setState({assignments: res.data , didMount: true})})
-       .then(e => console.log(e))
+           else{
+            //    let arr = res.data.splice(0, Math.floor(res.data.length / 2))
+            //    console.log('Half array ' , arr)
+        this.setState({assignments: res.data , didMount: true})}})
+           
+       .catch(e => console.log(e))
     }
 
     render(){

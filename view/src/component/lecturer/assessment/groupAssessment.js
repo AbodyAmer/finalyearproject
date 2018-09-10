@@ -13,7 +13,7 @@ import {connect} from 'react-redux'
         this.fedval = this.fedval.bind(this)
         this.saveAssessment = this.saveAssessment.bind(this)
         this.remove = this.remove.bind(this)
-        this.updateAssessment = this.updateAssessment.bind(this)
+        // this.updateAssessment = this.updateAssessment.bind(this)
         this.state = {
             didMount: false, 
             newAssessment: true,

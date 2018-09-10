@@ -146,7 +146,7 @@ module.exports = app => {
                 url = `./controller/files/answers/group/${req.params.intake}/${req.params.module}`
                 console.log('it is a group')
                 let ext = mime.getExtension(req.files.file.mimetype)
-                let name = req.params.student + '.' + ext
+                let name = req.params.student +'-'+req.params.module +'.' + ext
                 try{
 
                     fs.mkdirSync(url , 0o776)
@@ -191,7 +191,7 @@ module.exports = app => {
             else{
                 url = `./controller/files/answers/individual/${req.params.intake}/${req.params.module}`
                 let ext = mime.getExtension(req.files.file.mimetype)
-                let name = req.params.student + '.' + ext
+                let name = req.params.student +'-'+ req.params.module+'.' + ext
                 try{
 
                     fs.mkdirSync(url , 0o776)
@@ -204,7 +204,7 @@ module.exports = app => {
 
                     let fname = fileName.split('.')
                     if(fname[0] === req.params.student){
-                        fs.unlinkSync(`${url}/${fileName}`)
+                        fs.unlinkSync(`${url}/${fileName}-${req.params.module}`)
                     }
                 })
 
@@ -243,7 +243,7 @@ module.exports = app => {
                 url = `./controller/files/answers/group/${req.params.intake}/${req.params.module}`
                 console.log('it is a group')
                 let ext = mime.getExtension(req.files.file.mimetype)
-                let name = req.params.student + '.' + ext
+                let name = req.params.student +'-'+req.params.module+'.' + ext
                 try{
                     
                     fs.mkdirSync(url , 0o776)
@@ -278,7 +278,7 @@ module.exports = app => {
             else{
                 url = `./controller/files/answers/individual/${req.params.intake}`
                 let ext = mime.getExtension(req.files.file.mimetype)
-                let name = req.params.student + '.' + ext
+                let name = req.params.student + '-' +req.params.module +'.' + ext
                 try{
                     
                     fs.mkdirSync(url , 0o776)

@@ -64,7 +64,7 @@ class DownloadAssignments extends Component {
           </Fragment>:
           <Fragment>
                {this.props.allintakes.map(student => 
-             
+                    console.log('student ' , student) ||
                   <tr key={student[0][0].tp}>
                    <th scope="row">{student[0][0].tp}</th>
                    <td scope="row">{student[0][0].studentName}</td>
