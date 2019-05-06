@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --mode development --open --hot"
+    "start": "webpack-dev-server --mode development --open --hot",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +23,8 @@
     "react-router-dom": "^4.3.1",
     "reactstrap": "^6.2.0",
     "redux": "^4.0.0",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "snyk": "^1.161.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
@@ -35,5 +38,6 @@
     "webpack": "^4.13.0",
     "webpack-cli": "^3.0.8",
     "webpack-dev-server": "^3.1.4"
-  }
+  },
+  "snyk": true
 }
